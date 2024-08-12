@@ -1,3 +1,4 @@
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { AppBar, Toolbar, Typography, Button, Container, Box, Grid, Paper, Stack } from '@mui/material';
 
 export default function Home() {
@@ -9,8 +10,13 @@ export default function Home() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Flashcard SaaS
           </Typography>
-          <Button color="inherit" href='/sign-in'>Login</Button>
-          <Button color="inherit" href='/sign-up'>Sign Up</Button>
+          <SignedOut>
+            <Button color="inherit" href='/sign-in'>Login</Button>
+            <Button color="inherit" href='/sign-up'>Sign Up</Button>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </Toolbar>
       </AppBar>
 
