@@ -1,35 +1,41 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
-const systemPrompt = `You are a flashcard creator. Create 20 flashcards based on the input text.
+const systemPrompt = `
+You are a flashcard creator. You will take in text and create 5 flashcards from it. 
 
-The output should be formatted as follows:
-[
-   {
-       front: 'Front of the card',
-       back: 'Back of the card'
-   }
-]
+Each flashcard should have a "front" and "back" key, where the front contains a term, question, or concept, and the back contains the corresponding definition, answer, or explanation.
+
+You should return the flashcards in the following json format:
+{
+    "flashcards": [
+        {
+            "front": "Front of the card",
+            "back": "Back of the card"
+        }
+    ]
+}
 `;
 
-export async function POST(req) {
-    const data = await req.json();
 
-    // Fetch the response from the Gemini API using built-in fetch
-    const response = await fetch("https://api.gemini.com/v1/flashcards/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.GEMINI_API_KEY}`
-        },
-        body: JSON.stringify({
-            prompt: systemPrompt,
-            input: data // Adjust based on how your input is structured
-        })
+export async function POST(req) {
+    const openai = new OpenAI({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPENAI_API_KEY
     });
 
-    const result = await response.json();
+    const data = await req.text();
 
-    const flashcards = result.data;  // Adjust based on the response structure from Gemini
+    const completion = await openai.chat.completions.create({
+        messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: data }
+        ],
+        model: "gpt-3.5-turbo",
+        response_format: {type: 'json_object'},
+    });
 
-    return NextResponse.json(flashcards);
+    const flashcards = JSON.parse(completion.choices[0].message.content)
+
+    return NextResponse.json(flashcards.flashcards);
 }
