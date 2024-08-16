@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const systemPrompt = `
-You are a flashcard creator. You will take in text and create 5 flashcards from it. 
-
-Each flashcard should have a "front" and "back" key, where the front contains a term, question, or concept, and the back contains the corresponding definition, answer, or explanation.
+You are a flashcard creator. You will take in text and create multiple flashcards from it. Make sure to create 5 flashcards from it.
+Front and back of card should be one sentence long
 
 You should return the flashcards in the following json format:
 {
