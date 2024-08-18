@@ -14,12 +14,14 @@ export default function Flashcard() {
     useEffect(() => {
         async function getFlashcards() {
             if (!user || !user.id) {
-                return;  // Exit if user is not loaded or doesn't have an ID
+                return;  // exit if user is not loaded or doesn't have an ID
             }
 
             const docRef = doc(collection(db, 'users'), user.id);
             const docSnap = await getDoc(docRef);
+
             if (docSnap.exists()) {
+                // assuming 'flashcards' is an array of objects with a 'name' property
                 const collections = docSnap.data().flashcards;
                 console.log("Flashcards data:", collections);
                 setFlashcards(collections || []);

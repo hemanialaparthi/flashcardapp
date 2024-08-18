@@ -11,7 +11,7 @@ export default function Flashcard() {
     const [flashcards, setFlashcards] = useState([]);
     const [flipped, setFlipped] = useState({});
 
-    // Get query parameter
+    // get query parameter
     const searchParams = useSearchParams();
     const search = searchParams.get('id');
 
@@ -30,10 +30,10 @@ export default function Flashcard() {
         getFlashcard();
     }, [search, user]);
 
-    const handleCardClick = (index) => {
-        setFlipped((prevState) => ({
-            ...prevState,
-            [index]: !prevState[index],
+    const handleCardClick = (id) => {
+        setFlipped((prev) => ({
+            ...prev,
+            [id]: !prev[id],
         }));
     };
 

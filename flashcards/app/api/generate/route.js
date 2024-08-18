@@ -16,7 +16,6 @@ You should return the flashcards in the following json format:
 }
 `;
 
-
 export async function POST(req) {
     const openai = new OpenAI({
         baseURL: "https://openrouter.ai/api/v1",
