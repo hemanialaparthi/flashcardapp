@@ -52,6 +52,7 @@ export default function Generate() {
             }
             
             const data = await response.json();
+            console.log("Generated flashcards:", data);
             setFlashcards(data);
             
             setSnackbar({ 
@@ -89,12 +90,18 @@ export default function Generate() {
             });
             return;
         }
-
+        
+        console.log("Starting to save flashcards:", { name, flashcards, userId: user?.id });
+        
         try {
             setLoading(true);
             const batch = writeBatch(db);
             const docRef = doc(collection(db, 'users'), user.id);
+            
+            console.log("Getting document:", docRef.path);
             const docSnap = await getDoc(docRef);
+            
+            console.log("Document exists:", docSnap.exists(), "Data:", docSnap.data());
 
             if (docSnap.exists()) {
                 // Check if a flashcard collection with the same name exists
@@ -110,15 +117,20 @@ export default function Generate() {
                 
                 const collections = docSnap.data().flashcards || [];
                 collections.push({ name, flashcards });
+                
+                console.log("Updating document with collections:", collections);
                 batch.set(docRef, { flashcards: collections });
 
                 // Add each flashcard to a subcollection with a batch
                 flashcards.forEach((flashcard, index) => {
                     const flashcardRef = doc(collection(doc(collection(db, 'users'), user.id), name), `card-${index}`);
+                    console.log("Adding flashcard to:", flashcardRef.path);
                     batch.set(flashcardRef, flashcard);
                 });
 
+                console.log("Committing batch...");
                 await batch.commit();
+                console.log("Batch committed successfully");
                 
                 setSnackbar({ 
                     open: true, 
@@ -128,14 +140,18 @@ export default function Generate() {
                 
                 router.push('/flashcards');
             } else {
+                console.log("Document doesn't exist, creating new document");
                 batch.set(docRef, { flashcards: [{ name, flashcards }] });
 
                 flashcards.forEach((flashcard, index) => {
                     const flashcardRef = doc(collection(doc(collection(db, 'users'), user.id), name), `card-${index}`);
+                    console.log("Adding flashcard to:", flashcardRef.path);
                     batch.set(flashcardRef, flashcard);
                 });
 
+                console.log("Committing batch...");
                 await batch.commit();
+                console.log("Batch committed successfully");
                 
                 setSnackbar({ 
                     open: true, 
@@ -149,7 +165,7 @@ export default function Generate() {
             console.error("Error saving flashcards:", err);
             setSnackbar({ 
                 open: true, 
-                message: 'Failed to save flashcards. Please try again.', 
+                message: 'Failed to save flashcards. Please try again: ' + err.message, 
                 severity: 'error' 
             });
         } finally {
