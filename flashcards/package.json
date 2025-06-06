@@ -13,7 +13,6 @@
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@google/generative-ai": "^0.17.0",
-    "@mui/icons-material": "^5.17.1",
     "@mui/material": "^5.16.7",
     "firebase": "^10.12.5",
     "next": "14.2.5",
